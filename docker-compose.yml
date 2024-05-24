@@ -5,19 +5,19 @@ services:
     build: .
     container_name: api
     ports:
-      - "6000:5000"
+      - "6000:6000"
     volumes:
       - .:/app/api
     depends_on:
-      - db
+      - mysql_db
     networks:
       - flask-pytest-mock
 
-  db:
+  mysql_db:
     image: mysql:8.0
-    container_name: db
+    container_name: mysql_db
     ports:
-      - "33006:3306"
+      - "33007:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_test
