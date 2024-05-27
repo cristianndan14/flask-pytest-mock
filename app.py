@@ -20,8 +20,12 @@ class User(db.Model):
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
 
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
+    def to_json(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email
+        }
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,8 +34,14 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __repr__(self):
-        return f"Post('{self.title}', '{self.date_posted}')"
+    def to_json(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "date_posted": self.date_posted,
+            "content": self.content,
+            "user_id": self.user_id
+        }
     
 
 @app.route("/", methods=["GET"])
@@ -52,7 +62,13 @@ def alive():
 def users_list():
     try:
         users = User.query.all()
-        return
+        users_data = [user.to_json() for user in users]
+        response = {
+            "code": 200,
+            "data": users_data,
+            "message": "datos solicitados exitosamente."
+        }
+        return jsonify(response), 200
     except Exception as e:
         return jsonify({ "error": str(e) }), 500
 
